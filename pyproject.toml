@@ -1,0 +1,16 @@
+[project]
+name = "financial-analyst-agent"
+version = "0.1.0"
+description = "An AI-powered Agentic Financial Analyst that automates stock analysis by combining technical indicators, financial metrics, and structured insights using LangGraph and OpenAI."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "ipykernel>=6.30.1",
+    "langchain>=0.3.27",
+    "langchain-openai>=0.3.32",
+    "langgraph>=0.6.6",
+    "pandas>=2.3.2",
+    "python-dotenv>=1.1.1",
+    "ta>=0.11.0",
+    "yfinance>=0.2.65",
+]
