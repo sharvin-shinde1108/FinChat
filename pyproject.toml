@@ -10,6 +10,7 @@ dependencies = [
     "langchain>=0.3.27",
     "langchain-openai>=0.3.32",
     "langgraph>=0.6.6",
+    "langsmith>=0.4.23",
     "matplotlib>=3.10.6",
     "pandas>=2.3.2",
     "python-dotenv>=1.1.1",

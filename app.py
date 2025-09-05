@@ -8,8 +8,12 @@ from langgraph.graph import START, StateGraph
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode, tools_condition
 
+from langsmith import traceable
+
 from tools import get_stock_prices, get_financial_metrics
 
+os.environ.setdefault("LANGCHAIN_TRACING_V2", "true")
+os.environ.setdefault("LANGCHAIN_PROJECT", "financial-analyst-agent")
 
 class State(TypedDict):
     messages: Annotated[List[BaseMessage], add_messages]
@@ -45,6 +49,7 @@ Answer the user's specific question directly and succinctly.
 Be measured and avoid definitive financial advice. If data is missing, state so briefly.
 """
 
+@traceable(name="fundamental_analyst")   # NEW: trace this node as a chain
 def fundamental_analyst(state: State):
     llm = ChatOpenAI(model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"), temperature=0.2)
     tools = [get_stock_prices, get_financial_metrics]

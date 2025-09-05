@@ -13,6 +13,8 @@ from langchain_core.messages import HumanMessage
 from app import build_graph            # your LangGraph app builder
 from tools import get_stock_prices     # tool returning prices + indicators
 
+from langsmith import traceable
+
 load_dotenv()
 GRAPH = build_graph()  # compile once at startup
 
@@ -78,6 +80,7 @@ def _plot_macd(indicators):
 
 # ---------- core handler ----------
 
+@traceable(name="gradio_analyze")
 def analyze(ticker: str, question: str, model_name: str, show_charts: bool):
     """
     1) Set model via OPENAI_MODEL (used in your app).

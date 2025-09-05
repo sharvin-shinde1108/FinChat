@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Dict, Any, Annotated
 from datetime import datetime
 import pandas as pd
 import yfinance as yf
@@ -9,6 +9,7 @@ from ta.volume import VolumeWeightedAveragePrice
 
 from langchain_core.tools import tool
 
+from langsmith import traceable
 
 def _series_to_points(s: pd.Series, last_n: int = 12):
     """Convert a pandas Series to a list of {date, value} points (ISO date)."""
@@ -18,96 +19,7 @@ def _series_to_points(s: pd.Series, last_n: int = 12):
         for d, v in s.items()
     ]
 
-
-# @tool
-# def get_stock_prices(ticker: str) -> Dict[str, Any]:
-#     """
-#     Fetch historical OHLCV data and compute RSI, Stochastic, MACD, VWAP.
-
-#     Args:
-#         ticker: Stock symbol, e.g., "AAPL", "TSLA".
-
-#     Returns:
-#         dict with 'ticker', 'period', 'interval', 'latest_close', 'indicators', and 'sample_prices'.
-#     """
-#     if not ticker or not isinstance(ticker, str):
-#         raise ValueError("Please provide a valid ticker symbol, e.g., 'AAPL'.")
-
-#     period = "18mo"
-#     interval = "1wk"
-
-#     # Download price data
-#     df = yf.download(
-#         tickers=ticker,
-#         period=period,
-#         interval=interval,
-#         auto_adjust=False,
-#         progress=False,
-#         threads=True,
-#     )
-
-#     if df.empty:
-#         raise ValueError(f"No data returned for ticker '{ticker}'. Check the symbol or try a different period.")
-
-#     # Ensure columns
-#     for col in ["Open", "High", "Low", "Close", "Volume"]:
-#         if col not in df.columns:
-#             raise ValueError(f"Expected column '{col}' not found in data.")
-
-#     # Indicators
-#     close = df["Close"]
-#     high = df["High"]
-#     low = df["Low"]
-#     volume = df["Volume"]
-
-#     # RSI
-#     rsi = RSIIndicator(close=close, window=14).rsi()
-
-#     # Stochastic Oscillator
-#     stoch = StochasticOscillator(high=high, low=low, close=close, window=14, smooth_window=3)
-#     stoch_k = stoch.stoch()          # %K
-#     stoch_d = stoch.stoch_signal()   # %D
-
-#     # MACD
-#     macd_ind = MACD(close=close, window_slow=26, window_fast=12, window_sign=9)
-#     macd = macd_ind.macd()
-#     macd_signal = macd_ind.macd_signal()
-#     macd_hist = macd_ind.macd_diff()
-
-#     # VWAP (uses a rolling window; here we use full-series for context)
-#     vwap = VolumeWeightedAveragePrice(high=high, low=low, close=close, volume=volume, window=14).volume_weighted_average_price()
-
-#     # Build response
-#     latest_close = float(close.dropna().iloc[-1])
-#     result = {
-#         "ticker": ticker.upper(),
-#         "period": period,
-#         "interval": interval,
-#         "latest_close": latest_close,
-#         "indicators": {
-#             "rsi": _series_to_points(rsi),
-#             "stochastic_k": _series_to_points(stoch_k),
-#             "stochastic_d": _series_to_points(stoch_d),
-#             "macd": _series_to_points(macd),
-#             "macd_signal": _series_to_points(macd_signal),
-#             "macd_hist": _series_to_points(macd_hist),
-#             "vwap": _series_to_points(vwap),
-#         },
-#         # small sample of price history for the LLM context
-#         "sample_prices": [
-#             {
-#                 "date": idx.strftime("%Y-%m-%d"),
-#                 "open": float(row["Open"]),
-#                 "high": float(row["High"]),
-#                 "low": float(row["Low"]),
-#                 "close": float(row["Close"]),
-#                 "volume": int(row["Volume"]),
-#             }
-#             for idx, row in df.tail(16).iterrows()
-#         ],
-#     }
-#     return result
-
+# @traceable(name="get_stock_prices")
 @tool
 def get_stock_prices(ticker: str) -> Dict[str, Any]:
     """
@@ -189,7 +101,7 @@ def get_stock_prices(ticker: str) -> Dict[str, Any]:
     }
 
 
-
+# @traceable(name="get_financial_metrics")
 @tool
 def get_financial_metrics(ticker: str) -> Dict[str, Any]:
     """
