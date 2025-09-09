@@ -12,6 +12,8 @@ from langsmith import traceable
 
 from tools import get_stock_prices, get_financial_metrics
 
+from IPython.display import Image, display
+
 os.environ.setdefault("LANGCHAIN_TRACING_V2", "true")
 os.environ.setdefault("LANGCHAIN_PROJECT", "financial-analyst-agent")
 
@@ -74,10 +76,19 @@ def build_graph():
     graph.add_edge("tools", "fundamental_analyst")
     return graph.compile()
 
+def save_graph_png(app):
+    # Get the PNG bytes
+    png_bytes = app.get_graph().draw_mermaid_png()
+
+    # Save to file
+    with open("graph.png", "wb") as f:
+        f.write(png_bytes)
+
 
 def main():
     load_dotenv()
     app = build_graph()
+    save_graph_png(app)
 
     stock = os.getenv("STOCK_SYMBOL", "TSLA")
     user_question = os.getenv("USER_QUESTION", "Should I buy this stock?")

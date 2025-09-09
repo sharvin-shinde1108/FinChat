@@ -18,6 +18,15 @@ from langsmith import traceable
 load_dotenv()
 GRAPH = build_graph()  # compile once at startup
 
+# def save_graph_png(GRAPH):
+#     # Get the PNG bytes
+#     png_bytes = GRAPH.get_graph().draw_mermaid_png()
+
+#     # Save to file
+#     with open("graph.png", "wb") as f:
+#         f.write(png_bytes)
+
+# save_graph_png(GRAPH)
 
 # ---------- plotting helpers (return FILE PATHS) ----------
 
