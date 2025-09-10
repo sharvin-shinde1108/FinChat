@@ -22,14 +22,26 @@ DATA_DIR = Path("faq_data")
 STORE_DIR = Path("storage/faiss_edu")  # if CHROMA, this is the persist directory
 STORE_DIR.mkdir(parents=True, exist_ok=True)
 
+# def load_docs():
+#     paths = list(DATA_DIR.glob("*.md")) + list(DATA_DIR.glob("*.txt"))
+#     if not paths:
+#         raise FileNotFoundError(f"No FAQ files found in {DATA_DIR.resolve()}")
+#     docs = []
+#     for p in paths:
+#         loader = TextLoader(str(p), encoding="utf-8")
+#         docs.extend(loader.load())
+#     return docs
+
+from langchain.text_splitter import MarkdownHeaderTextSplitter
+
 def load_docs():
     paths = list(DATA_DIR.glob("*.md")) + list(DATA_DIR.glob("*.txt"))
-    if not paths:
-        raise FileNotFoundError(f"No FAQ files found in {DATA_DIR.resolve()}")
     docs = []
     for p in paths:
-        loader = TextLoader(str(p), encoding="utf-8")
-        docs.extend(loader.load())
+        text = Path(p).read_text(encoding="utf-8")
+        # Split by "## " headers
+        splitter = MarkdownHeaderTextSplitter(headers_to_split_on=[("##", "question")])
+        docs.extend(splitter.split_text(text))
     return docs
 
 def main():
